@@ -35,7 +35,6 @@ public class Event {
     private Timestamp startTime;
 
     @Column(name = "end_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp endTime;
 
     public Event(String title, String description, List<User> attendees, Timestamp startTime, Timestamp endTime) {
@@ -46,10 +45,15 @@ public class Event {
         this.endTime = endTime;
     }
 
-    public Event() {}
+    public Event() {
+    }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {

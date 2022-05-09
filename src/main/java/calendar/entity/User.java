@@ -25,10 +25,15 @@ public class User {
         this.credentials = credentials;
     }
 
-    public User() {}
+    public User() {
+    }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getLogin() {
