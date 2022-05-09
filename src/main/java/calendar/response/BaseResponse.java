@@ -1,6 +1,6 @@
 package calendar.response;
 
-public class BaseResponse implements Response {
+public class BaseResponse {
 
     protected String message;
 
@@ -8,9 +8,8 @@ public class BaseResponse implements Response {
         this.message = message;
     }
 
-    @Override
     public String getMessage() {
-        return null;
+        return message;
     }
 
     public void setMessage(String message) {

@@ -25,16 +25,15 @@ public class UserService {
         this.userRepository.save(user);
     }
 
+    public User findById(Long id) {
+        return this.userRepository.findById(id).orElse(null);
+    }
+
     public User findByLogin(String login) {
         return this.userRepository.findByLogin(login);
     }
 
-    public List<User> findAllByIdIn(List<Long> ids) {
-        return this.userRepository.findAllByIdIn(ids);
-    }
-
     public User getCurrentAuthUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return findByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 

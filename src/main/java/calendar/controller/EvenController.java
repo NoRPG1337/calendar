@@ -3,10 +3,10 @@ package calendar.controller;
 import calendar.entity.Event;
 import calendar.exception.BadRequestException;
 import calendar.exception.NotFoundException;
+import calendar.helper.Message;
 import calendar.request.EventRequest;
 import calendar.response.BaseResponse;
 import calendar.response.DataResponse;
-import calendar.response.Response;
 import calendar.response.projection.EventProjection;
 import calendar.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class EvenController {
     ) throws BadRequestException {
         this.eventService.validateRequest(request);
         this.eventService.create(request);
-        return new ResponseEntity<>(new BaseResponse(""), HttpStatus.CREATED);
+        return new ResponseEntity<>(new BaseResponse(Message.EVENT_CREATED), HttpStatus.CREATED);
     }
 
     @DeleteMapping("")
@@ -44,17 +44,17 @@ public class EvenController {
     ) throws NotFoundException {
         Event event = this.eventService.findById(id);
         if (event == null) {
-            throw new NotFoundException("");
+            throw new NotFoundException(Message.eventNotFound(id));
         }
         this.eventService.delete(event);
-        return new ResponseEntity<>(new BaseResponse(""), HttpStatus.OK);
+        return new ResponseEntity<>(new BaseResponse(Message.eventDeleted(id)), HttpStatus.OK);
     }
 
     @GetMapping("")
-    public ResponseEntity<BaseResponse> get(
+    public ResponseEntity<BaseResponse> getEventMatrix(
             @RequestParam Timestamp startTime
     ) {
         Map<String, List<EventProjection>> map = this.eventService.findAllForWeek(startTime);
-        return new ResponseEntity<>(new DataResponse<>(map, ""), HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse<>(map, Message.SUCCESS), HttpStatus.OK);
     }
 }
