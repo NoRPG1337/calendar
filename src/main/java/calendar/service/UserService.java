@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -26,6 +27,10 @@ public class UserService {
 
     public User findByLogin(String login) {
         return this.userRepository.findByLogin(login);
+    }
+
+    public List<User> findAllByIdIn(List<Long> ids) {
+        return this.userRepository.findAllByIdIn(ids);
     }
 
     public User getCurrentAuthUser() {

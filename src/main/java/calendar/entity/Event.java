@@ -1,5 +1,8 @@
 package calendar.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
@@ -19,6 +22,7 @@ public class Event {
     private String description;
 
     @ManyToMany
+    @Cascade(value = org.hibernate.annotations.CascadeType.DETACH)
     @JoinTable(
             name = "events_attendees",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -27,9 +31,11 @@ public class Event {
     private List<User> attendees;
 
     @Column(name = "start_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp startTime;
 
     @Column(name = "end_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp endTime;
 
     public Event(String title, String description, List<User> attendees, Timestamp startTime, Timestamp endTime) {
