@@ -1,6 +1,5 @@
 package calendar.config.security;
 
-import calendar.entity.User;
 import calendar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +18,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = this.userService.findByLogin(username);
-        return CustomUserDetails.toUserDetails(user);
+        return CustomUserDetails.toUserDetails(this.userService.findByLogin(username));
     }
 }

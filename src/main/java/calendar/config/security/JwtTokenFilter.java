@@ -13,15 +13,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static io.jsonwebtoken.lang.Strings.hasText;
-
 @Component
 public class JwtTokenFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION_TYPE = "Bearer";
 
     private JwtTokenProvider jwtTokenProvider;
-
     private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
@@ -39,22 +37,20 @@ public class JwtTokenFilter extends GenericFilterBean {
             ServletResponse servletResponse,
             FilterChain filterChain
     ) throws IOException, ServletException {
-        String token = getTokenFromRequest((HttpServletRequest) servletRequest);
-
+        String token = extractToken((HttpServletRequest) servletRequest);
         if (token != null && this.jwtTokenProvider.validateToken(token)) {
-            String userLogin = this.jwtTokenProvider.getLoginFromToken(token);
-            CustomUserDetails customUserDetails = this.customUserDetailsService.loadUserByUsername(userLogin);
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+            String login = this.jwtTokenProvider.getLoginFromToken(token);
+            CustomUserDetails customUserDetails = this.customUserDetailsService.loadUserByUsername(login);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUserDetails, null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String bearer = request.getHeader(AUTHORIZATION);
-        if (hasText(bearer) && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7);
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader(AUTHORIZATION);
+        if (header != null && header.startsWith(AUTHORIZATION_TYPE)) {
+            return header.substring(AUTHORIZATION_TYPE.length() + 1);
         }
         return null;
     }

@@ -23,6 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtTokenFilter = jwtTokenFilter;
     }
 
+    //Base configuration
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.httpBasic().disable()
@@ -30,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/event/*").authenticated()
+                .antMatchers("/event").authenticated()
                 .antMatchers("/auth").permitAll()
                 .and()
                 .addFilterBefore(this.jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -38,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling().accessDeniedPage("/access-denied");
     }
 
+    //Swagger configuration
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
