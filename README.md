@@ -38,3 +38,5 @@ DB_NAME = X
 DB_USER = X
 DB_PASSWORD = X
 ```
+
+![Pic 1](https://i.ibb.co/kXy81v7/df.gif)
