@@ -4,7 +4,6 @@ import calendar.entity.User;
 import calendar.repository.UserRepository;
 import calendar.request.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +30,10 @@ public class UserService {
 
     public User findByLogin(String login) {
         return this.userRepository.findByLogin(login);
+    }
+
+    public List<User> findAllExceptCurrent() {
+        return this.userRepository.findAllByIdIsNot(this.getCurrentAuthUser().getId());
     }
 
     public User getCurrentAuthUser() {

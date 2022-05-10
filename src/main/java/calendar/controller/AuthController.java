@@ -11,9 +11,12 @@ import calendar.response.BaseResponse;
 import calendar.response.DataResponse;
 import calendar.response.projection.UserProjection;
 import calendar.service.UserService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,8 +36,9 @@ public class AuthController {
     }
 
     @PostMapping(value = "")
+    @ApiOperation(value = "Authorization by login and password")
     public ResponseEntity<BaseResponse> auth(
-            @RequestBody AuthRequest request
+            @ApiParam(value = "Authorization request") @Validated @RequestBody AuthRequest request
     ) throws BadRequestException {
         User user = this.userService.findByLogin(request.getLogin());
 
@@ -51,7 +55,8 @@ public class AuthController {
         return new ResponseEntity<>(new AuthResponse(token, Message.AUTH_SUCCESS), HttpStatus.OK);
     }
 
-    @GetMapping("")
+    @GetMapping("/by-token")
+    @ApiOperation(value = "Authorization by token")
     public ResponseEntity<BaseResponse> auth() throws UnauthorizedException {
         User user = this.userService.getCurrentAuthUser();
 

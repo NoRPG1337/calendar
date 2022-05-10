@@ -4,11 +4,16 @@ import calendar.entity.User;
 import de.bripkens.gravatar.DefaultImage;
 import de.bripkens.gravatar.Gravatar;
 import de.bripkens.gravatar.Rating;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel(description = "User projection")
 public class UserProjection {
 
+    @ApiModelProperty(value = "User credentials")
     private String credentials;
 
+    @ApiModelProperty(value = "User generated avatar")
     private String avatar;
 
     public UserProjection(User user) {

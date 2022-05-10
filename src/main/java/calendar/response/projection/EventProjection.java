@@ -1,25 +1,34 @@
 package calendar.response.projection;
 
 import calendar.entity.Event;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@ApiModel(description = "Event projection")
 public class EventProjection {
 
     private static final SimpleDateFormat time = new SimpleDateFormat("HH:mm");
 
+    @ApiModelProperty(value = "Event ID")
     private Long id;
 
+    @ApiModelProperty(value = "Event title")
     private String title;
 
+    @ApiModelProperty(value = "Event description")
     private String description;
 
+    @ApiModelProperty(value = "Event start time", example = "10:00")
     private String startTime;
 
+    @ApiModelProperty(value = "Event end time", example = "12:00")
     private String endTime;
 
+    @ApiModelProperty(value = "Event attendees")
     private List<UserProjection> attendees;
 
     public EventProjection(Event event) {
