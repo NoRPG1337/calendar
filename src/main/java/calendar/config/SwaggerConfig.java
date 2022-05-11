@@ -28,8 +28,10 @@ public class SwaggerConfig {
                 .build()
                 .directModelSubstitute(Timestamp.class, String.class)
                 .additionalModels(typeResolver.resolve(
-                        EventProjection.class,
-                        UserProjection.class,
+                        EventProjection.class))
+                .additionalModels(typeResolver.resolve(
+                        UserProjection.class))
+                .additionalModels(typeResolver.resolve(
                         UserOptionProjection.class));
     }
 

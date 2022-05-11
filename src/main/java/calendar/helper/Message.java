@@ -16,6 +16,8 @@ public class Message {
 
     public static String EVENT_OVERLAP = "Events must not overlap each over";
 
+    public static String EVENT_MATRIX_INVALID_TIME = "Request start time is not a Monday";
+
     public static String eventDeleted(Long id) {
         return String.format("Successfully deleted event with ID %d", id);
     }

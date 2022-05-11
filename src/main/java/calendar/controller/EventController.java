@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -74,8 +75,11 @@ public class EventController {
     @ApiOperation(value = "Events' matrix creation")
     public ResponseEntity<BaseResponse> getEventMatrix(
             @ApiParam(value = "Week's start time", example = "2022-05-02 00:00:01") @RequestParam Timestamp startTime
-    ) {
+    ) throws BadRequestException {
         Map<String, List<EventProjection>> map = this.eventService.findAllForWeek(startTime);
+        if (!this.eventService.isThisDayOfWeek(startTime, Calendar.MONDAY)) {
+            throw new BadRequestException(Message.EVENT_MATRIX_INVALID_TIME);
+        }
         return new ResponseEntity<>(new DataResponse<>(map, Message.SUCCESS), HttpStatus.OK);
     }
 }

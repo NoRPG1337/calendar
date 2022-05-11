@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,10 +27,10 @@ public class EventService {
     private EventRepository eventRepository;
     private UserService userService;
 
-    @Value("day.start")
+    @Value("${day.start}")
     private String start;
 
-    @Value("day.end")
+    @Value("${day.end}")
     private String end;
 
     @Autowired
@@ -53,19 +55,20 @@ public class EventService {
     }
 
     public void validateRequest(EventRequest request) throws BadRequestException {
-        Timestamp startTime = request.getStartTime();
-        Timestamp endTime = request.getEndTime();
+        Timestamp startTime = this.setAsLocal(request.getStartTime());
+        Timestamp endTime = this.setAsLocal(request.getEndTime());
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
         if (endTime.compareTo(startTime) <= 0 || currentTime.compareTo(startTime) > 0) {
             throw new BadRequestException(Message.EVENT_INVALID_TIME);
         }
 
-        if (this.isLessThan(startTime, start) || !this.isLessThan(endTime, end)) {
+        if (!this.isMoreThan(startTime, start) || this.isMoreThan(startTime, end) ||
+                this.isMoreThan(endTime, end) || !this.isMoreThan(endTime, start)) {
             throw new BadRequestException(Message.EVENT_INVALID_TIME);
         }
 
-        if (this.isSunday(startTime)) {
+        if (this.isThisDayOfWeek(startTime, Calendar.SUNDAY)) {
             throw new BadRequestException(Message.EVENT_INVALID_TIME);
         }
 
@@ -74,9 +77,9 @@ public class EventService {
         }
     }
 
-    public void create(EventRequest eventRequest) throws BadRequestException {
+    public void create(EventRequest request) throws BadRequestException {
         List<User> attendees = new ArrayList<>();
-        for (Long id : eventRequest.getAttendeesIds()) {
+        for (Long id : request.getAttendeesIds()) {
             User user = this.userService.findById(id);
             if (user == null) {
                 throw new BadRequestException(Message.userNotFound(id));
@@ -84,13 +87,14 @@ public class EventService {
                 attendees.add(user);
             }
         }
+        attendees.add(this.userService.getCurrentAuthUser());
 
         Event event = new Event(
-                eventRequest.getTitle(),
-                eventRequest.getDescription(),
+                request.getTitle(),
+                request.getDescription(),
                 attendees,
-                eventRequest.getStartTime(),
-                eventRequest.getEndTime()
+                this.setAsLocal(request.getStartTime()),
+                this.setAsLocal(request.getEndTime())
         );
 
         this.save(event);
@@ -115,27 +119,44 @@ public class EventService {
         return Timestamp.valueOf(timestamp.toLocalDateTime().plusDays(1));
     }
 
-    public boolean isSunday(Timestamp timestamp) {
+    public boolean isThisDayOfWeek(Timestamp timestamp, int dayOfWeek) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(timestamp);
-        return calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
+        return calendar.get(Calendar.DAY_OF_WEEK) == dayOfWeek;
     }
 
-    public boolean isLessThan(Timestamp timestamp, String actual) {
+    public boolean isMoreThan(Timestamp timestamp, String actual) {
         String toCompare = time.format(timestamp);
 
         String[] units = actual.split(":");
+        this.trimStringForTimeUnit(units);
         Calendar toCompareCalendar = Calendar.getInstance();
         toCompareCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(units[0]));
         toCompareCalendar.set(Calendar.MINUTE, Integer.parseInt(units[1]));
         toCompareCalendar.set(Calendar.SECOND, Integer.parseInt(units[2]));
 
         units = toCompare.split(":");
+        this.trimStringForTimeUnit(units);
         Calendar actualCalendar = Calendar.getInstance();
         actualCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(units[0]));
         actualCalendar.set(Calendar.MINUTE, Integer.parseInt(units[1]));
         actualCalendar.set(Calendar.SECOND, Integer.parseInt(units[2]));
 
         return toCompareCalendar.before(actualCalendar);
+    }
+
+    public void trimStringForTimeUnit(String[] units) {
+        for (int i = 0; i < units.length; i++) {
+            if (units[i].charAt(0) == '0') {
+                units[i] = units[i].substring(1);
+            }
+        }
+    }
+
+    public Timestamp setAsLocal(Timestamp timestamp) {
+        Instant instant = timestamp.toInstant();
+        Duration d = Duration.ofHours(4);
+        Instant hourPrior = instant.minus( d );
+        return Timestamp.from(hourPrior);
     }
 }

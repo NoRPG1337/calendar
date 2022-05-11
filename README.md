@@ -1,3 +1,10 @@
+# Project's description
+
+App allows creating calendar event with selected attendees.
+* Used MVC pattern and RESTful API
+* Used Gravatar for generating avatars for users
+* Used Swagger for project documentation
+
 # Project's structure
 
 Package                                         | Description
@@ -38,5 +45,3 @@ DB_NAME = X
 DB_USER = X
 DB_PASSWORD = X
 ```
-
-![Pic 1](https://i.ibb.co/kXy81v7/df.gif)
